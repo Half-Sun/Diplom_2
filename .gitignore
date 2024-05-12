@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+
+# Allure reports
+/allure_reports
+
+# Logs
+/logs/
+
+# Miscellaneous
+*.log
+*.bak
+*.swp
+.DS_Store
