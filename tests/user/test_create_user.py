@@ -1,20 +1,6 @@
 import pytest, allure, requests
-from data import CREATE_USER_URL, UPDATE_USER_URL
-from conftest import generate_unique_user
-
-
-@pytest.fixture
-def user():
-    return generate_unique_user()
-
-
-@pytest.fixture
-def created_user(user):
-    response = requests.post(CREATE_USER_URL, json=user)
-    assert response.status_code == 200
-    assert response.json()["success"] == True
-    yield user
-    requests.delete(f"{UPDATE_USER_URL}/{user['email']}", json=user)
+from data import CREATE_USER_URL
+from conftest import user, created_user
 
 
 class TestUserCreation:
@@ -40,6 +26,3 @@ class TestUserCreation:
         assert response.status_code == 403
         assert response.json()["message"] == "Email, password and name are required fields"
 
-
-if __name__ == "__main__":
-    pytest.main()

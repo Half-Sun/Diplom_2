@@ -1,26 +1,25 @@
 import random
+import logging
 import allure
 import requests
+
+from conftest import user_with_authorization, available_ingredients
 from data import CREATE_ORDER_URL
-from conftest import get_available_ingredients, user_with_authorization
 
-
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class TestCreateOrder:
     @allure.title("Test creating order with authorization")
-    def test_create_order_with_authorization(self, user_with_authorization):
+    def test_create_order_with_authorization(self, user_with_authorization, available_ingredients):
         _, access_token = user_with_authorization
 
-        response = get_available_ingredients()
-        assert response["success"] == True
-
-        ingredients = response["data"]
-        print("Available ingredients:", ingredients)
+        ingredients = available_ingredients
+        logger.info("Available ingredients: %s", ingredients)
 
         assert all(isinstance(ingredient, dict) for ingredient in ingredients)
 
         selected_ingredients = random.sample(ingredients, 2)
-
         selected_ingredient_ids = [ingredient["_id"] for ingredient in selected_ingredients]
 
         response = requests.post(
@@ -33,14 +32,10 @@ class TestCreateOrder:
         assert response.json()["success"] == True
 
     @allure.title("Test creating order without authorization")
-    def test_create_order_without_authorization(self):
-        response = get_available_ingredients()
-        assert response["success"] == True
-
-        ingredients = response["data"]
+    def test_create_order_without_authorization(self, available_ingredients):
+        ingredients = available_ingredients
 
         selected_ingredients = random.sample(ingredients, 2)
-
         selected_ingredient_ids = [ingredient["_id"] for ingredient in selected_ingredients]
 
         response = requests.post(

@@ -1,11 +1,14 @@
 import random
 import allure
 from data import CREATE_ORDER_URL, GET_ORDERS_URL
-from conftest import user_with_authorization, get_available_ingredients
+from conftest import user_with_authorization
+from helpers import get_available_ingredients
 import requests
+import logging
 
 
-
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class TestCreateUserOrderAndRetrieveOrders:
     @allure.title("Test creating user order and retrieving orders without authorization")
@@ -40,7 +43,7 @@ class TestCreateUserOrderAndRetrieveOrders:
         assert response["success"] == True
 
         ingredients = response["data"]
-        print("Available ingredients:", ingredients)
+        logger.info("Available ingredients: %s", ingredients)
 
         assert all(isinstance(ingredient, dict) for ingredient in ingredients)
 

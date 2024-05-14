@@ -1,13 +1,7 @@
 import allure
-import pytest, requests
+import requests
 from data import CREATE_USER_URL, LOGIN_URL, UPDATE_USER_URL
-from conftest import generate_unique_user
-
-
-@pytest.fixture
-def user():
-    return generate_unique_user()
-
+from conftest import user
 
 class TestUserLogin:
     @allure.title("Test login for existing user")
