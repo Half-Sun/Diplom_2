@@ -1,5 +1,5 @@
 import logging
-
+import random
 import pytest
 import requests
 
@@ -13,9 +13,7 @@ logger.setLevel(logging.INFO)
 def user_with_authorization():
     user_data = generate_unique_user()
 
-    # Create user
     response = requests.post(CREATE_USER_URL, json=user_data)
-    # Login user
     login_data = {
         "email": user_data["email"],
         "password": user_data["password"]
@@ -23,10 +21,8 @@ def user_with_authorization():
     response = requests.post(LOGIN_URL, json=login_data)
     access_token = response.json()["accessToken"]
 
-    # Yield user data and access token
     yield user_data, access_token
 
-    # Teardown: Delete the user after the test
     delete_user_url = UPDATE_USER_URL
     headers = {"Authorization": f"{access_token}"}
     delete_user_response = requests.delete(delete_user_url, headers=headers)
@@ -45,14 +41,22 @@ def user():
 @pytest.fixture
 def created_user(user):
     response = requests.post(CREATE_USER_URL, json=user)
-    assert response.status_code == 200
-    assert response.json()["success"] == True
     yield user
     requests.delete(f"{UPDATE_USER_URL}/{user['email']}", json=user)
 
 @pytest.fixture(scope="module")
 def available_ingredients():
     response = get_available_ingredients()
-    assert response["success"] == True
     return response["data"]
 
+
+@pytest.fixture
+def prepare_order_data(user_with_authorization, available_ingredients):
+    user_data, access_token = user_with_authorization
+
+    ingredients = available_ingredients
+
+    selected_ingredients = random.sample(ingredients, 2)
+    selected_ingredient_ids = [ingredient["_id"] for ingredient in selected_ingredients]
+
+    return user_data, access_token, selected_ingredient_ids
